@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Unique AI Business Name Generator</title>
+<style>
+  body {
+    background: linear-gradient(135deg, #f0f4fd 0%, #eaf6fb 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Verdana, Geneva, Tahoma, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    max-width: 430px;
+    margin: 40px auto 0 auto;
+    background: #fff;
+    padding: 2.5rem 2rem 2rem 2rem;
+    border-radius: 24px;
+    box-shadow: 0 6px 32px rgba(70,100,190,0.14);
+    text-align: center;
+  }
+  h1 {
+    font-size: 2rem;
+    color: #281e5d;
+    margin-bottom: 1.3rem;
+    letter-spacing: 2px;
+  }
+  .info {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 12px;
+  }
+  .user-form {
+    margin-bottom: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  textarea {
+    width: 95%;
+    border: 1.5px solid #d8e6fc;
+    border-radius: 8px;
+    padding: 0.7rem;
+    font-size: 1rem;
+    margin-bottom: 0.1rem;
+    min-height: 36px;
+    resize: vertical;
+  }
+  #uploadLabel {
+    display: inline-block;
+    background: #e0ecfe;
+    color: #4165bf;
+    border-radius: 7px;
+    padding: 0.54rem 1rem;
+    cursor: pointer;
+    font-weight: 600;
+    border: 1.5px solid #d0e3ff;
+    transition: background 0.16s;
+    margin-bottom: 10px;
+  }
+  #uploadLabel:hover {
+    background: #cfddfc;
+  }
+  #fileInput {
+    display: none;
+  }
+  .image-preview {
+    width: 118px;
+    height: 118px;
+    border-radius: 16px;
+    background: #f1f6ff;
+    border: 2px solid #e0e9fe;
+    margin: 8px auto 14px auto;
+    object-fit: cover;
+    display: none;
+  }
+  .result {
+    min-height: 3rem;
+    font-size: 1.25rem;
+    color: #21396a;
+    background: #f8fafd;
+    border: 2px dashed #d6e6fe;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    padding: 1.1rem 0.3rem;
+    font-weight: bold;
+    transition: border-color 0.2s;
+    white-space: pre-wrap;
+  }
+  button#generateBtn {
+    background: linear-gradient(90deg, #7b63df, #43d9aa);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 0.7rem 2rem;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: background 0.2s, transform 0.09s;
+    box-shadow: 0 2px 8px rgba(80, 120, 180, 0.08);
+    margin-top: 10px;
+  }
+  button#generateBtn:active {
+    transform: scale(0.98);
+  }
+  footer {
+    text-align: center;
+    font-size: 1rem;
+    margin-top: 44px;
+    color: #4b5581;
+  }
+  @media (max-width: 530px) {
+    .container {
+      max-width: 99vw;
+      padding: 1.2rem 1rem;
+    }
+    h1 {
+      font-size: 1.17rem;
+    }
+    .result {
+      font-size: 0.99rem;
+      padding: 0.82rem 0.14rem;
+    }
+    button#generateBtn {
+      font-size: 1rem;
+      padding: 0.5rem 1rem;
+    }
+    .image-preview {
+      width: 88px;
+      height: 88px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Unique AI Business Name Generator</h1>
+  <div class="info">
+    Describe your business (required). Upload an image for extra inspiration (optional).
+  </div>
+  <form class="user-form" id="businessForm" autocomplete="off">
+    <textarea
+      id="businessDesc"
+      placeholder="Describe your business (industry, style, target audience, etc.)..."
+      required
+    ></textarea>
+    <label id="uploadLabel" for="fileInput">Upload Image (optional)</label>
+    <input id="fileInput" type="file" accept="image/*" />
+    <img id="previewImg" class="image-preview" alt="Image preview" />
+    <button id="generateBtn" type="submit">Generate Unique Name</button>
+  </form>
+  <div class="result" id="result">
+    📝 Please enter business details above.
+    <br />(Uploading an image is optional.)
+  </div>
+  <div style="font-size:12px;color:#999;">
+    AI image analysis demo — API key needed for real results.
+  </div>
+</div>
+<footer>
+  Made with <span style="color: #ff4d4f;">❤</span> for entrepreneurs!
+</footer>
+
+<script>
+  // Utility to pick random item from an array
+  function getRandom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  // Intelligent split and categorize of user input words into adjectives and nouns
+  function splitAndTagWords(str) {
+    const adjectiveSuffixes = ['ly', 'ive', 'ic', 'ous', 'al', 'ful', 'y', 'ed'];
+    const alwaysAdjective = [
+      'eco',
+      'organic',
+      'green',
+      'sustainable',
+      'modern',
+      'friendly',
+      'fresh',
+      'digital',
+      'smart',
+      'fast',
+      'creative',
+      'natural',
+      'urban',
+      'bright',
+    ];
+    const words = str
+      .split(/[,\.\-\n; ]+/)
+      .map((w) => w.trim())
+      .filter((w) => w.length > 1);
+    let adjectives = [],
+      nouns = [];
+    words.forEach((word) => {
+      let lc = word.toLowerCase();
+      if (
+        adjectiveSuffixes.some((suffix) => lc.endsWith(suffix)) ||
+        alwaysAdjective.includes(lc)
+      ) {
+        adjectives.push(word.charAt(0).toUpperCase() + word.slice(1));
+      } else {
+        nouns.push(word.charAt(0).toUpperCase() + word.slice(1));
+      }
+    });
+    return { adjectives, nouns };
+  }
+
+  // Mock AI image analyzer: returns dummy tags after delay (replace with real API)
+  async function analyzeImageAI(file) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(['Creative', 'Nature', 'Inspire']);
+      }, 1000);
+    });
+  }
+
+  // Keeps track of generated names in this session to guarantee uniqueness
+  const usedNames = new Set();
+
+  // Generate a unique name combining user input + AI labels, no repeats
+  function generateUniqueName(userDesc, aiLabels = []) {
+    let { adjectives, nouns } = splitAndTagWords(userDesc);
+
+    // Add AI labels as optional adjectives + nouns (prevent duplicates)
+    aiLabels.forEach((label) => {
+      if (!adjectives.includes(label)) adjectives.push(label);
+      if (!nouns.includes(label)) nouns.push(label);
+    });
+
+    // If no nouns present, promote adjectives to nouns
+    if (nouns.length === 0 && adjectives.length > 0) {
+      nouns = adjectives.slice();
+      adjectives = [];
+    }
+    // If no adjectives present, copy nouns as adjectives
+    if (adjectives.length === 0 && nouns.length > 0) {
+      adjectives = nouns.slice();
+    }
+
+    const suffixes = ['', '', '', ' Hub', ' Group', ' Co', ' Inc.'];
+
+    // Generate all possible combinations (adjective + noun [+ suffix]) in an array
+    const combinations = [];
+    for (let adj of adjectives) {
+      for (let noun of nouns) {
+        for (let suffix of suffixes) {
+          combinations.push(`${adj} ${noun}${suffix}`);
+        }
+      }
+    }
+
+    // Filter out used names
+    const available = combinations.filter((name) => !usedNames.has(name));
+
+    if (available.length === 0) {
+      return null; // No unique names available
+    }
+    // Pick a random available unique name
+    const chosen = getRandom(available);
+    usedNames.add(chosen);
+    return chosen;
+  }
+
+  // Handle image preview
+  const fileInput = document.getElementById('fileInput');
+  const previewImg = document.getElementById('previewImg');
+
+  fileInput.addEventListener('change', function () {
+    const file = this.files && this.files[0];
+    if (!file) {
+      previewImg.style.display = 'none';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      previewImg.src = e.target.result;
+      previewImg.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Handle form submission
+  const form = document.getElementById('businessForm');
+  const resultDiv = document.getElementById('result');
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    resultDiv.style.borderColor = '#d6e6fe';
+    let desc = document.getElementById('businessDesc').value.trim();
+
+    if (!desc) {
+      resultDiv.textContent = '❗ Please describe your business (required).';
+      return;
+    }
+
+    let aiLabels = [];
+    const file = fileInput.files && fileInput.files[0];
+    if (file) {
+      resultDiv.textContent = '⏳ Analyzing image with AI...';
+      aiLabels = await analyzeImageAI(file);
+    }
+
+    let name = generateUniqueName(desc, aiLabels);
+
+    if (!name) {
+      resultDiv.style.borderColor = '#d9534f';
+      resultDiv.textContent =
+        '⚠️ No more unique names can be generated with the current input. Please try different or more detailed descriptions.';
+      return;
+    }
+
+    resultDiv.style.borderColor = '#68c995';
+    resultDiv.textContent = name;
+  });
+</script>
+</body>
+</html>
